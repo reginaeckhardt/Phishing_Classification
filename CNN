@@ -81,10 +81,26 @@ model.add(Dropout(0.5))
 model.add(MaxPooling1D(pool_size=2))
 model.add(Flatten())
 model.add(Dense(1, activation='sigmoid'))
+model.add(Activation('softmax'))
 model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 result = model.fit(trainX, y_train, validation_data=(testX, y_test), epochs=5)
 
 print(model.summary())
+
+np.set_printoptions(precision=8)
+probability = model.predict_proba(testX)
+classes = model.predict_classes(testX, batch_size=16)
+
+class_names = ['Phishing','Spam']
+from lime.lime_text import LimeTextExplainer
+explainer = LimeTextExplainer(class_names=class_names)
+idx = 200
+exp = explainer.explain_instance(testX[idx], probability, num_features=6)
+print('Document id: %d' % idx)
+print('Probability(Spam) =', model.predict_proba([testX[idx]])[0,1])
+print('True class: %s' % class_names[y_test[idx]])
+
+
 loss = result.history['loss']
 val_loss = result.history['val_loss']
 epochs = range(1, len(loss) + 1)
