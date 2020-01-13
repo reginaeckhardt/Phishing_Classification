@@ -81,8 +81,8 @@ encoded_test_texts = [one_hot(t,vocab_size) for t in X_test]
     # "pad_sequence takes a LIST of sequences as an input (list of list) and will return a list of padded sequences. "
     # "# pad documents to a specific size
 max_length = 70
-padded_train_docs = pad_sequences(encoded_train_texts,maxlen=max_length,padding="post",truncating="post")
-padded_test_docs = pad_sequences(encoded_test_texts,maxlen=max_length,padding="post",truncating="post")
+trainX = pad_sequences(encoded_train_texts,maxlen=max_length,padding="post",truncating="post")
+testX = pad_sequences(encoded_test_texts,maxlen=max_length,padding="post",truncating="post")
 
 inputs1 = Input(shape=(max_length,))
 embedding1 = Embedding(vocab_size, 100)(inputs1)
@@ -107,10 +107,33 @@ flat3 = Flatten()(pool3)
 
 merged = concatenate([flat1, flat2, flat3])
 dense1 = Dense(10, activation='relu')(merged)
-outputs = Dense(1, activation='sigmoid')(dense1)
+#outputs = Dense(1, activation='sigmoid')(dense1)
+outputs = Dense(2, activation='softmax')(dense1)
 model = Model(inputs=[inputs1, inputs2, inputs3], outputs=outputs1)
+
+y_train1 =[]
+for x in y_train:
+    if x==0:
+        y_train1.append([1,0])
+    else:
+        y_train1.append([0,1])
+y_test1 =[]
+for x in y_test:
+    if x==0:
+        y_test1.append([1,0])
+    else:
+        y_test1.append([0,1])
+y_train1 = np.vstack(y_train1)
+y_test1 = np.vstack(y_test1)
 
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 model.fit([trainX,trainX,trainX], array(y_train), validation_data=([testX,testX,testX],y_test), epochs=1, batch_size=16)
 
 print(model.summary())
+probabilities = model.predict([testX,testX,testX])
+
+class_names = ['Spam','Phishing']
+from lime.lime_text import LimeTextExplainer
+explainer = LimeTextExplainer(class_names=class_names)
+idx = 10
+exp = explainer.explain_instance(X_test[idx], model.predict, num_features=6)
