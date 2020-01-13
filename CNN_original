@@ -41,16 +41,16 @@ mydata=pd.read_csv(filepath)
 
 # the text column contains the body of the email and we only want to analyze the body
 # the missing entries NaN will be replaced with ignore 
-mydata['text'] = mydata['text'].fillna("Ignore")
-new_data = mydata['text'].dropna(axis = 0, how ='any') 
+mydata['bodyHtml'] = mydata['bodyHtml'].fillna("Ignore")
+new_data = mydata['bodyHtml'].dropna(axis = 0, how ='any') 
   
 # comparing sizes of data frames 
-print("Old data frame length:", len(mydata['text']), "\nNew data frame length:",  
+print("Old data frame length:", len(mydata['bodyHtml']), "\nNew data frame length:",  
        len(new_data), "\nNumber of rows with at least 1 NA value: ", 
-       (len(mydata['text'])-len(new_data)))
+       (len(mydata['bodyHtml'])-len(new_data)))
 # From the last output we can see that we do not have any NaN values - so we can still work with mydata
 
-texts = mydata['text'].tolist()
+texts = mydata['bodyHtml'].tolist()
 print(texts[:5])
 
 # we want to replace phishing vs. spam with integer values since this is easier to handle and easier to interpret
