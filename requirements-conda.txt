@@ -1,0 +1,14 @@
+jupyter==1.0.0
+jupyterlab==1.1.4
+keras==2.3.1
+keras-preprocessing==1.1.0
+matplotlib==3.1.1
+notebook==6.0.1
+numpy==1.16.5
+pandas==0.25.1
+pytest==5.2.1
+scikit-learn==0.21.3
+seaborn==0.9.0
+scipy==1.4.1
+statsmodels==0.10.1
+tensorflow==1.15.0
