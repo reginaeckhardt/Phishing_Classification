@@ -1,6 +1,7 @@
 /.ipynb_checkpoints/
 /data/raw/
 /models/trained/
+*.h5
 
 *.idea/
 __pycache__
