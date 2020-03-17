@@ -11,7 +11,7 @@ from sklearn.model_selection import train_test_split
 PATH = os.path.dirname(os.path.abspath(__file__))
 
 
-def load_data(vocab_size):
+def load_data(max_length, vocab_size):
     path = os.path.join(PATH, "raw", "spam-flat3.csv")
     mydata = pd.read_csv(path)
     with_subject = mydata["subject"] + " " + mydata["bodyHtml"]
@@ -21,8 +21,8 @@ def load_data(vocab_size):
     mydata.loc[mydata['phishing'].astype(str) == 'True', 'phishing'] = 1
     y = mydata['phishing'].astype(int).tolist()
     X_ws_train, X_ws_test, y_train, y_test = train_test_split(X_ws, y, test_size=0.3, random_state=42)
-    trainX = preprocess_text(X_ws_train)
-    testX = preprocess_text(X_ws_test)
+    trainX = preprocess_text(X_ws_train, max_length=max_length, vocab_size=vocab_size)
+    testX = preprocess_text(X_ws_test, max_length=max_length, vocab_size=vocab_size)
     trainY = preprocess_label(y_train)
     testY = preprocess_label(y_test)
     return X_ws_train, X_ws_test, trainX, trainY, testX, testY
@@ -37,9 +37,7 @@ def stemSentence(sentence):
         return "".join(stem_sentence)
 
 
-def preprocess_text(data_x):
-    max_length = 350
-    vocab_size = 10000
+def preprocess_text(data_x, max_length=350, vocab_size=10000):
     X_2 = [stemSentence(x) for x in data_x]
     encoded_texts_ws = [one_hot(t, vocab_size) for t in X_2]
     padded_texts_ws = pad_sequences(encoded_texts_ws, maxlen=max_length, padding="post", truncating="post")
@@ -47,6 +45,7 @@ def preprocess_text(data_x):
 
 
 def preprocess_label(data_y):
+    # TODO: Kann durch keras.utils.to_categorical ersetzt werden
     y_1 = []
     for x in data_y:
         if x == 0:
