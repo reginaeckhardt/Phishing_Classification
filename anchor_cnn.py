@@ -6,8 +6,8 @@ from alibi.utils.download import spacy_model
 from keras.preprocessing.sequence import pad_sequences
 from keras.preprocessing.text import one_hot
 
-from spam_flat import load_data
-from spam_flat import stemSentence
+from data.spam_flat import load_data
+from data.spam_flat import stemSentence
 from models.spam_flat_cnn import load_model
 
 VOCAB_SIZE = 10000

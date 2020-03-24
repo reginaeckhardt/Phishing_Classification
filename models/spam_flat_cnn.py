@@ -6,13 +6,15 @@ from keras.callbacks import ModelCheckpoint
 from keras.metrics import Precision, Recall
 from numpy import array
 
-from cnn_model import build_model
-from spam_flat import load_data
+from data.spam_flat import load_data
+from models.cnn_model import build_model
 
 PATH = os.path.dirname(os.path.abspath(__file__))
 
 
 def save_model(model, fname):
+    if not os.path.exists(os.path.join(PATH, "trained")):
+        os.mkdir(os.path.join(PATH, "trained"))
     model_path = os.path.join(PATH, "trained", fname)
     model.save(model_path)
 

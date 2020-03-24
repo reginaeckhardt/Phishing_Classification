@@ -20,7 +20,10 @@ porter = PorterStemmer()
 
 
 def preprocess_data(max_length, vocab_size):
-    path = os.path.join(PATH, "data", "raw", "spam-flat3.csv")
+    if not os.path.exists(os.path.join(PATH, "raw", "spam-flat3.csv")):
+        raise FileNotFoundError("Please place 'spam-flat3.csv in folder data/raw/")
+
+    path = os.path.join(PATH, "raw", "spam-flat3.csv")
     mydata = pd.read_csv(path)
     # with_subject = mydata["subject"] + " " + mydata["bodyHtml"]
     # with_subject = with_subject.fillna("Ignore")
@@ -37,17 +40,20 @@ def preprocess_data(max_length, vocab_size):
     trainY = preprocess_label(y_train)
     testY = preprocess_label(y_test)
     data = (X_ws_train, X_ws_test, trainX, trainY, testX, testY)
-    with open(os.path.join(PATH, "data", "processed", f"spam-flat3_{max_length}_{vocab_size}.pickle"), "wb") as f:
+    if not os.path.exists(os.path.join(PATH, "processed")):
+        os.mkdir(os.path.join(PATH, "processed"))
+
+    with open(os.path.join(PATH, "processed", f"spam-flat3_{max_length}_{vocab_size}.pickle"), "wb") as f:
         pickle.dump(data, f)
 
 
 def load_data(max_length, vocab_size):
-    if not os.path.exists(os.path.join(PATH, "data", "processed", f"spam-flat3_{max_length}_{vocab_size}.pickle")):
+    if not os.path.exists(os.path.join(PATH, "processed", f"spam-flat3_{max_length}_{vocab_size}.pickle")):
         print("Data not found, preprocessing data...")
         preprocess_data(max_length, vocab_size)
         print("Done preprocessing")
 
-    with open(os.path.join(PATH, "data", "processed", f"spam-flat3_{max_length}_{vocab_size}.pickle"), "rb") as f:
+    with open(os.path.join(PATH, "processed", f"spam-flat3_{max_length}_{vocab_size}.pickle"), "rb") as f:
         return pickle.load(f)
 
 
@@ -74,8 +80,6 @@ def preprocess_label(data_y):
     y_1 = np.vstack(y_1)
     return y_1
 
-
-# In[ ]:
 
 if __name__ == "__main__":
     load_data(350, 10000)
