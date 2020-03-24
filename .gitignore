@@ -1,5 +1,6 @@
 /.ipynb_checkpoints/
 /data/raw/
+/data/processed/
 /models/trained/
 *.h5
 
