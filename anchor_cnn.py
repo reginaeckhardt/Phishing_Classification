@@ -1,6 +1,7 @@
 #import itertools
 import os
 import string
+import numpy as np
 import spacy
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 from alibi.explainers import AnchorText
@@ -20,7 +21,8 @@ class_names = ['Spam', 'Phishing']
 print("Loading data...")
 X_ws_train, X_ws_test, trainX, trainY, testX, testY = load_data(MAX_LENGTH, VOCAB_SIZE)
 
-print("Loading model...")
+
+print("Loading model...") 
 model = load_model("spam_flat_cnn.h5")
 
 print("Loading NLP model...")
@@ -35,7 +37,25 @@ nlp = spacy.load(model_en)
 def predict_cnn(text):
     stem_texts = (stemSentence(x) for x in text)
     encoded_texts = [one_hot(t, VOCAB_SIZE) for t in stem_texts]
-    encoded_input = pad_sequences(encoded_texts, maxlen=MAX_LENGTH, padding="post", truncating="post")
+    #encoded_input = pad_sequences(encoded_texts, maxlen=MAX_LENGTH, padding="post", truncating="post")
+    #new part
+    encoded_texts_1=[]
+    for texts in encoded_texts:
+        if texts==[]:
+            texts=[0]
+        else:
+            texts = texts
+        encoded_texts_1.append(texts)
+
+    # flatten encoded_texts_1 vector
+    encoded_texts_2 = [item for sublist in encoded_texts_1 for item in sublist]
+    encoded_texts_3 = np.array(encoded_texts_2,ndmin=2)
+    encoded_texts_4 = encoded_texts_3.T  
+    zero_matrix = np.zeros([MAX_LENGTH,1],dtype=int)
+#zero_matrix = zero_matrix.T
+    zero_matrix[:1] = 1
+    zero_matrix = zero_matrix.T   
+    encoded_input  = encoded_texts_4*zero_matrix
     return model.predict([encoded_input, encoded_input, encoded_input])
 
 def compute_anchor(text):
@@ -53,7 +73,7 @@ X_ws_test1 = ["".join(x if x in legal_characters else "" for x in line) for line
 assert len(X_ws_test1) == len(X_ws_test)
 
 
-for idx, test_email in enumerate(X_ws_test1[30:40]):
+for idx, test_email in enumerate(X_ws_test1[:20]):
     if testY[idx][1] == 1:
         print(test_email)
         print('Position Phishing E-Mail in Test Data', X_ws_test1.index(test_email))
